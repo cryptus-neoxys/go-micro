@@ -1,39 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/cryptus-neoxys/go-micro/prod-api/handlers"
 )
 
 
 func main() {
-    hello := func (w http.ResponseWriter, r *http.Request)  {
-        log.Println("Hello World")
-    }
-    bye := func (w http.ResponseWriter, r *http.Request) {
-        log.Println("Bbye World")
-    }
+	l := log.New(os.Stdout, "prod-api", log.LstdFlags)
 
-    http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
-        log.Println("Hello, World")
-
-        d, err := ioutil.ReadAll(r.Body)
-        if(err != nil) {
-            http.Error(w, "Ooopsie", http.StatusBadRequest)
-            return
-            // <- Same as above -> 👆🏻
-            // w.WriteHeader(http.StatusBadRequest)
-            // w.Write([]byte ("Ooopsie"))
-            // return
-        }
-        fmt.Fprintf(w, "Data: %s", d)
-    })
-        
-    http.HandleFunc("/hello", hello)
-        
-    http.HandleFunc("/bye", bye)
+	hh := handlers.NewHello(l)
     
-    http.ListenAndServe(":42069", nil)
+	sm := http.NewServeMux()
+	sm.Handle("/", hh)
+
+    http.ListenAndServe(":9091", sm)
 }
