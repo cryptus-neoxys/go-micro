@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/cryptus-neoxys/go-micro/prod-api/handlers"
@@ -22,28 +23,34 @@ func main() {
 	sm.Handle("/goodbye", gh)
 
 	s := &http.Server{
-		Addr:         ":9091",
+		Addr:         ":8080",
 		Handler:      sm,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
 	}
 
-	go func ()  {
+	go func() {
+		l.Println("Starting on http://localhost:8080")
 		err := s.ListenAndServe()
 		if err != nil {
 			l.Fatal(err)
 		}
 	}()
 
-	sigChan := make(chan os.Signal)
+	// trap sigterm or interupt and gracefully shutdown the server
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
-	signal.Notify(sigChan, os.Kill)
+	signal.Notify(sigChan, syscall.SIGTERM)
 
-	sig := <- sigChan
-	l.Println("Received Terminate, Shutting down gracefully", sig)
+	// Block until a signal is received.
+	sig := <-sigChan
+	l.Println("Received Terminate, Shutting down gracefully. Sig: ", sig)
 
-
-	tc, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	s.Shutdown(tc)
+	// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
+	tc, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if err := s.Shutdown(tc); err != nil {
+		l.Println("shutdown error")
+	}
 }
