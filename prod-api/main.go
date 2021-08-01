@@ -17,9 +17,11 @@ func main() {
 
 	hh := handlers.NewHello(l)
 	gh := handlers.NewGoodbye(l)
+	ph := handlers.NewProducts(l)
 
 	sm := http.NewServeMux()
-	sm.Handle("/", hh)
+	sm.Handle("/", ph)
+	sm.Handle("/hello", hh)
 	sm.Handle("/goodbye", gh)
 
 	s := &http.Server{
