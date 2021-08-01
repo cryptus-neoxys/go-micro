@@ -8,14 +8,14 @@ import (
 
 // Product defines the structure for an API product
 type Product struct {
-	ID          int `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
 	Price       float32 `json:"price"`
-	SKU         string `json:"sku"`
-	CreatedOn   string `json:"-"`
-	UpdatedOn   string `json:"-"`
-	DeletedOn   string `json:"-"`
+	SKU         string  `json:"sku"`
+	CreatedOn   string  `json:"-"`
+	UpdatedOn   string  `json:"-"`
+	DeletedOn   string  `json:"-"`
 }
 
 // Products is a collection of Product
@@ -31,7 +31,6 @@ func (p *Products) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(p)
 }
-
 
 // GetProducts returns a list of products
 func GetProducts() Products {

@@ -7,7 +7,7 @@ import (
 	"github.com/cryptus-neoxys/go-micro/prod-api/data"
 )
 
-type Products  struct{
+type Products struct {
 	l *log.Logger
 }
 
