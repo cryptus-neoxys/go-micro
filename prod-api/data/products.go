@@ -37,6 +37,22 @@ func GetProducts() Products {
 	return productList
 }
 
+func (p *Product) FromJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(p)
+}
+
+func AddProduct(p *Product) Products {
+	p.ID = getNextID()
+	productList = append(productList, p)
+	return productList
+}
+
+func getNextID() int {
+	lp := productList[len(productList)-1]
+	return lp.ID + 1
+}
+
 // productList is a hard coded list of products for this
 // example data source
 var productList = []*Product{
